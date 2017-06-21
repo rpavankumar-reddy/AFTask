@@ -1,0 +1,14 @@
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+before_build:
+  - nuget restore
+build:
+  parallel: true                     # enable MSBuild parallel builds
+  project: AFTask.sln      # path to Visual Studio solution or project
+# MSBuild verbosity level
+  verbosity: minimal
+after_test: 
+  - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:".\packages\NUnit.ConsoleRunner.3.6.1\tools\nunit3-console.exe" -targetargs:".\UnitTest\bin\Release\UnitTest.dll" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*Designer.cs -hideskipped:All -output:.\Codecoverage.xml 
+  - "SET PATH=C:\\Python27;C:\\Python27\\Tools\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -f "Codecoverage.xml"
